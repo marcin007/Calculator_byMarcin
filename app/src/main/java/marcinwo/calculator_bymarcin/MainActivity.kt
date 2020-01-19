@@ -74,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         }
         buttonDivide.setOnClickListener(opListener)
         buttonEquals.setOnClickListener(opListener)
+
         buttonMinus.setOnClickListener(opListener)
         buttonPlus.setOnClickListener(opListener)
         buttonMultiply.setOnClickListener(opListener)
