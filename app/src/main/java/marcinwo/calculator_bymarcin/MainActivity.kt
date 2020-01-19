@@ -46,8 +46,7 @@ class MainActivity : AppCompatActivity() {
         val buttonPlus: Button = findViewById<Button>(R.id.buttonPlus)
 
         val listener = View.OnClickListener { v ->
-            val b =
-                v as Button //(nie kazdy "views" maja "text" - zanim odniesiemy sie do wlasciwosci Text wiec musimy castowac
+            val b = v as Button //(nie kazdy "views" maja "text" - zanim odniesiemy sie do wlasciwosci Text wiec musimy castowac
             newNumber.append(b.text)
         }
 
@@ -64,13 +63,13 @@ class MainActivity : AppCompatActivity() {
         buttonDot.setOnClickListener(listener)
 
         val opListener = View.OnClickListener { v ->
-            val op = (v as Button).text.toString() // castuje i czyta tekst przypisany do string z EditText wiget
-            val value = newNumber.text.toString()
+            val op = (v as Button).text.toString() // castuje i czyta tekst przypisany do string z EditText wiget, przesyla np " + "
+            val value = newNumber.text.toString() // tutaj jest wpisywana do value liczba do obliczenia
             if (value.isNotEmpty()) {
                 performOperation(value, op)
             }
             pendingOperation = op
-            displayOperation.text = pendingOperation
+            displayOperation.text = pendingOperation // wpisywanie do po lewej znaku dzialania
         }
         buttonDivide.setOnClickListener(opListener)
         buttonEquals.setOnClickListener(opListener)
