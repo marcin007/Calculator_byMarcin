@@ -64,8 +64,7 @@ class MainActivity : AppCompatActivity() {
         buttonDot.setOnClickListener(listener)
 
         val opListener = View.OnClickListener { v ->
-            val op =
-                (v as Button).text.toString() // castuje i czyta tekst przypisany do string z EditText wiget
+            val op = (v as Button).text.toString() // castuje i czyta tekst przypisany do string z EditText wiget
             val value = newNumber.text.toString()
             if (value.isNotEmpty()) {
                 performOperation(value, op)
@@ -84,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         if (operand1 == null) {
             operand1 = value.toDouble()
         } else {
-            operand2 = value.toDouble();
+            operand2 = value.toDouble()
 
             if (pendingOperation == "=") {
                 pendingOperation = operation
