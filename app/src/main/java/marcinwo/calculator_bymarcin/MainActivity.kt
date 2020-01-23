@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
+import java.lang.NumberFormatException
 
 class MainActivity : AppCompatActivity() {
     private lateinit var result: EditText
@@ -65,10 +66,13 @@ class MainActivity : AppCompatActivity() {
 
         val opListener = View.OnClickListener { v ->
             val op = (v as Button).text.toString() // castuje i czyta tekst przypisany do string z EditText wiget
-            val value = newNumber.text.toString()
-            if (value.isNotEmpty()) {
+            try {
+                val value = newNumber.text.toString().toDouble()
                 performOperation(value, op)
+            }catch (e: NumberFormatException){
+                newNumber.setText("")
             }
+
             pendingOperation = op
             displayOperation.text = pendingOperation
         }
@@ -79,11 +83,11 @@ class MainActivity : AppCompatActivity() {
         buttonMultiply.setOnClickListener(opListener)
     }
 
-    private fun performOperation(value: String, operation: String) {
+    private fun performOperation(value: Double, operation: String) {
         if (operand1 == null) {
-            operand1 = value.toDouble()
+            operand1 = value
         } else {
-            operand2 = value.toDouble()
+            operand2 = value
 
             if (pendingOperation == "=") {
                 pendingOperation = operation
