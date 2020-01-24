@@ -1,13 +1,18 @@
 package marcinwo.calculator_bymarcin
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.NumberFormatException
+
+private const val STATE_PENDING_OPERATION = "PendingOperation"
+private const val STATE_OPERAND1 = "Operand1"
+private const val STATE_OPERAND1_STORED = "Operand1Stored"
 
 class MainActivity : AppCompatActivity() {
     private lateinit var result: EditText
@@ -16,7 +21,6 @@ class MainActivity : AppCompatActivity() {
 
     // Variabels to hold the operands and type of calculation
     private var operand1: Double? = null
-    private var operand2: Double = 0.0
     private var pendingOperation = "="
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +30,7 @@ class MainActivity : AppCompatActivity() {
         result = findViewById(R.id.result)
         newNumber = findViewById(R.id.newNumber)
 
-        //Data input buttons
+        // Data input buttons
         val button0: Button = findViewById(R.id.button0)
         val button1: Button = findViewById(R.id.button1)
         val button2: Button = findViewById(R.id.button2)
@@ -83,26 +87,46 @@ class MainActivity : AppCompatActivity() {
         buttonMultiply.setOnClickListener(opListener)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+       // Log.d(STATE_PENDING_OPERATION, "onSaceinstanceState called")
+        super.onSaveInstanceState(outState)
+        if (operand1 != null){
+            outState.putDouble(STATE_OPERAND1, operand1!!)
+            var a = outState.putBoolean(STATE_OPERAND1_STORED, true)
+        }
+        outState.putString(STATE_PENDING_OPERATION, pendingOperation)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        Log.d(STATE_PENDING_OPERATION, "onRestoreInstanceState called")
+        super.onRestoreInstanceState(savedInstanceState)
+        if(savedInstanceState.getBoolean(STATE_OPERAND1_STORED, false)){
+            operand1 = savedInstanceState.getDouble(STATE_OPERAND1)
+        }else{
+            operand1 = null
+        }
+        pendingOperation = savedInstanceState.getString(STATE_PENDING_OPERATION, "=")
+        displayOperation.text = pendingOperation
+    }
+
     private fun performOperation(value: Double, operation: String) {
         if (operand1 == null) {
             operand1 = value
         } else {
-            operand2 = value
-
             if (pendingOperation == "=") {
                 pendingOperation = operation
-             }
+            }
 
             when (pendingOperation) {
-                "=" -> operand1 = operand2
-                "/" -> if (operand2 == 0.0) {
-                    operand1 = Double.NaN // przypadek dzielenia przez zero
+                "=" -> operand1 = value
+                "/" -> operand1 = if (value == 0.0) {
+                    Double.NaN   // handle attempt to divide by zero
                 } else {
-                    operand1 = operand1!! / operand2
+                    operand1!! / value
                 }
-                "*" -> operand1 = operand1!! * operand2
-                "+" -> operand1 = operand1!! + operand2
-                "-" -> operand1 = operand1!! - operand2
+                "*" -> operand1 = operand1!! * value
+                "-" -> operand1 = operand1!! - value
+                "+" -> operand1 = operand1!! + value
             }
         }
         result.setText(operand1.toString())
