@@ -2,9 +2,9 @@ package marcinwo.calculator_bymarcin
 
 import android.os.Bundle
 import android.util.Log
-import androidx.appcompat.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import java.lang.NumberFormatException
 
@@ -22,8 +22,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val listener = View.OnClickListener { v ->
-            val b =
-                v as Button //(nie kazdy "views" maja "text" - zanim odniesiemy sie do wlasciwosci Text wiec musimy castowac
+            val b = v as Button
             newNumber.append(b.text)
         }
 
@@ -51,33 +50,29 @@ class MainActivity : AppCompatActivity() {
             pendingOperation = op
             operation.text = pendingOperation
         }
-        buttonDivide.setOnClickListener(opListener)
+
         buttonEquals.setOnClickListener(opListener)
+        buttonDivide.setOnClickListener(opListener)
+        buttonMultiply.setOnClickListener(opListener)
         buttonMinus.setOnClickListener(opListener)
         buttonPlus.setOnClickListener(opListener)
-        buttonMultiply.setOnClickListener(opListener)
-    }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-       // Log.d(STATE_PENDING_OPERATION, "onSaceinstanceState called")
-        super.onSaveInstanceState(outState)
-        if (operand1 != null){
-            outState.putDouble(STATE_OPERAND1, operand1!!)
-            var a = outState.putBoolean(STATE_OPERAND1_STORED, true)
+        NEG.setOnClickListener { view ->
+            val value = newNumber.text.toString()
+            if (value.isEmpty()) {
+                newNumber.setText("-")
+            } else {
+                try {
+                    var doubleValue = value.toDouble()
+                    doubleValue *= -1
+                    newNumber.setText(doubleValue.toString())
+                } catch (e: NumberFormatException) {
+                    // newNumber was "-" or ".", so clear it
+                    newNumber.setText("")
+                }
+            }
         }
-        outState.putString(STATE_PENDING_OPERATION, pendingOperation)
-    }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        Log.d(STATE_PENDING_OPERATION, "onRestoreInstanceState called")
-        super.onRestoreInstanceState(savedInstanceState)
-        if(savedInstanceState.getBoolean(STATE_OPERAND1_STORED, false)){
-            operand1 = savedInstanceState.getDouble(STATE_OPERAND1)
-        }else{
-            operand1 = null
-        }
-        pendingOperation = savedInstanceState.getString(STATE_PENDING_OPERATION, "=")
-        operation.text = pendingOperation
     }
 
     private fun performOperation(value: Double, operation: String) {
@@ -104,5 +99,24 @@ class MainActivity : AppCompatActivity() {
         newNumber.setText("")
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (operand1 != null) {
+            outState.putDouble(STATE_OPERAND1, operand1!!)
+            outState.putBoolean(STATE_OPERAND1_STORED, true)
+        }
+        outState.putString(STATE_PENDING_OPERATION, pendingOperation)
+    }
 
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        operand1 = if (savedInstanceState.getBoolean(STATE_OPERAND1_STORED, false)) {
+            savedInstanceState.getDouble(STATE_OPERAND1)
+        } else {
+            null
+        }
+
+        pendingOperation = savedInstanceState.getString(STATE_PENDING_OPERATION, "=")
+        operation.text = pendingOperation
+    }
 }
